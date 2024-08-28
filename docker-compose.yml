@@ -1,0 +1,134 @@
+version: '3.8'
+
+services:
+  elasticmq:
+    image: softwaremill/elasticmq
+    ports:
+      - "9324:9324"
+    volumes:
+      - ./scrapers/elasticmq.conf:/opt/elasticmq.conf  # Single config file containing both queues
+    command: -Dconfig.file=/opt/elasticmq.conf
+    networks:
+      - app-network
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: musicdb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Assuming init.sql sets up your DB schema
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  scraper1:
+    build:
+      context: ./scrapers/scraper1
+      dockerfile: Dockerfile
+    depends_on:
+      - elasticmq
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-west-2
+    command: >
+      sh -c "
+      until curl -s http://elasticmq:9324; do
+        echo 'Waiting for ElasticMQ to be ready...';
+        sleep 5;
+      done;
+      python handler.py"
+    networks:
+      - app-network
+    volumes:
+      - ./crud:/app/crud  # Ensure that the crud module is accessible to scraper1
+
+  scraper2:
+    build:
+      context: ./scrapers/scraper2
+      dockerfile: Dockerfile
+    depends_on:
+      - elasticmq
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-west-2
+    command: >
+      sh -c "
+      until curl -s http://elasticmq:9324; do
+        echo 'Waiting for ElasticMQ to be ready...';
+        sleep 5;
+      done;
+      python handler.py"
+    networks:
+      - app-network
+    volumes:
+      - ./crud:/app/crud  # Ensure that the crud module is accessible to scraper2
+
+  crud:
+    build:
+      context: ./crud
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=musicdb
+      - DB_USER=postgres
+      - DB_PASS=password
+    command: >
+      uvicorn handler:app --host 0.0.0.0 --port 8005
+    networks:
+      - app-network
+    ports:
+      - "8005:8005"
+    volumes:
+      - ./crud:/app/crud  # Mount the crud dir
+
+  processor:
+    build:
+      context: ./processor
+      dockerfile: Dockerfile
+    depends_on:
+      - elasticmq
+      - crud
+    environment:
+      - ELASTICMQ_URL=http://elasticmq:9324
+      - DB_HOST=db
+      - DB_NAME=musicdb
+      - DB_USER=postgres
+      - DB_PASS=password
+    command: >
+      sh -c "
+      until curl -s http://elasticmq:9324; do
+        echo 'Waiting for ElasticMQ to be ready...';
+        sleep 5;
+      done;
+      python handler.py"
+    networks:
+      - app-network
+    volumes:
+      - ./crud:/app/crud  # Ensure that the crud module is accessible to the processor
+
+  pipeline:
+    build:
+      context: ./  # Assuming Dockerfile for serverless is in the root
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - "3000:3000"  # Expose the serverless offline port
+    networks:
+      - app-network
+    command: >
+      sh -c "serverless offline"
+
+networks:
+  app-network:
+
+volumes:
+  db-data:

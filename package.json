@@ -1,0 +1,23 @@
+{
+  "name": "finalproject",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "serverless": "^3.39.0",
+    "serverless-offline": "^13.7.0"
+  },
+  "overrides": {
+    "serverless-offline-sqs": {
+      "serverless": "$serverless"
+    }
+  },
+  "devDependencies": {
+    "serverless-offline-sqs": "^8.0.0"
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "/app": {
+    "versionSfCore": null,
+    "versionFramework": "4.2.3",
+    "isWithinCompose": false,
+    "isCompose": false,
+    "composeOrgName": null,
+    "composeServiceName": null,
+    "servicePath": "/app",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "local-lambda-service",
+      "provider": {
+        "name": "aws",
+        "runtime": "python3.8",
+        "stage": "dev",
+        "region": "us-east-1"
+      },
+      "functions": {
+        "processSQSMessage": {
+          "handler": "processor2.handler",
+          "events": [
+            {
+              "sqs": {
+                "arn": {
+                  "Fn::GetAtt": [
+                    "SQSQueue",
+                    "Arn"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "resources": {
+        "Resources": {
+          "SQSQueue": {
+            "Type": "AWS::SQS::Queue",
+            "Properties": {
+              "QueueName": "my-queue"
+            }
+          }
+        }
+      },
+      "plugins": [
+        "serverless-offline-sqs",
+        "serverless-offline"
+      ]
+    },
+    "serviceRawFile": "service: local-lambda-service\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: python3.8\r\n  stage: dev\r\n  region: us-east-1\r\n\r\nfunctions:\r\n  processSQSMessage:\r\n    handler: processor2.handler\r\n    events:\r\n      - sqs:\r\n          arn:\r\n            Fn::GetAtt:\r\n              - SQSQueue\r\n              - Arn\r\n\r\nresources:\r\n  Resources:\r\n    SQSQueue:\r\n      Type: AWS::SQS::Queue\r\n      Properties:\r\n        QueueName: my-queue\r\n\r\nplugins:\r\n  - serverless-offline-sqs\r\n  - serverless-offline\r\n",
+    "command": [
+      "offline"
+    ],
+    "options": {},
+    "error": {
+      "message": "You must sign in or use a license key with Serverless Framework V.4 and later versions. Please use \"serverless login\".",
+      "stack": "Error: You must sign in or use a license key with Serverless Framework V.4 and later versions. Please use \"serverless login\".\n    at Authentication.getAuthenticatedData (file:///root/.serverless/releases/4.2.3/package/dist/sf-core.js:940:10542)\n    at async Authentication.resolverAuthenticate (file:///root/.serverless/releases/4.2.3/package/dist/sf-core.js:942:20540)\n    at async _Meta.authenticateAndResolve (file:///root/.serverless/releases/4.2.3/package/dist/sf-core.js:950:11261)\n    at async route (file:///root/.serverless/releases/4.2.3/package/dist/sf-core.js:950:16849)\n    at async Object.run2 [as run] (file:///root/.serverless/releases/4.2.3/package/dist/sf-core.js:950:17334)\n    at async run3 (file:///root/.serverless/releases/4.2.3/package/dist/sf-core.js:950:18594)"
+    },
+    "machineId": "c57cbe9778f6871176d5d676b6ea2aea",
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  },
+  "C:\\Users\\ibrah\\OneDrive\\سطح المكتب\\finalproject": {
+    "versionSfCore": null,
+    "versionFramework": "4.2.3",
+    "isWithinCompose": false,
+    "isCompose": false,
+    "composeOrgName": null,
+    "composeResolverProviders": {
+      "default-aws-credential-resolver": "<REDACTED>"
+    },
+    "composeServiceName": null,
+    "servicePath": "C:\\Users\\ibrah\\OneDrive\\سطح المكتب\\finalproject",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "local-lambda-service",
+      "provider": {
+        "name": "aws",
+        "runtime": "python3.8",
+        "stage": "dev",
+        "region": "us-east-1",
+        "versionFunctions": true
+      },
+      "functions": {
+        "processSQSMessage": {
+          "handler": "processor2.handler",
+          "events": [
+            {
+              "sqs": {
+                "arn": {
+                  "Fn::GetAtt": [
+                    "SQSQueue",
+                    "Arn"
+                  ]
+                }
+              }
+            }
+          ],
+          "name": "local-lambda-service-dev-processSQSMessage"
+        }
+      },
+      "resources": {
+        "Resources": {
+          "SQSQueue": {
+            "Type": "AWS::SQS::Queue",
+            "Properties": {
+              "QueueName": "my-queue"
+            }
+          }
+        }
+      },
+      "plugins": [
+        "serverless-offline-sqs",
+        "serverless-offline"
+      ]
+    },
+    "serviceRawFile": "service: local-lambda-service\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: python3.8\r\n  stage: dev\r\n  region: us-east-1\r\n\r\nfunctions:\r\n  processSQSMessage:\r\n    handler: processor2.handler\r\n    events:\r\n      - sqs:\r\n          arn:\r\n            Fn::GetAtt:\r\n              - SQSQueue\r\n              - Arn\r\n\r\nresources:\r\n  Resources:\r\n    SQSQueue:\r\n      Type: AWS::SQS::Queue\r\n      Properties:\r\n        QueueName: my-queue\r\n\r\nplugins:\r\n  - serverless-offline-sqs\r\n  - serverless-offline\r\n",
+    "command": [
+      "logs"
+    ],
+    "options": {
+      "function": "scraper2"
+    },
+    "error": {
+      "message": "Function \"scraper2\" doesn't exist in this Service",
+      "stack": "ServerlessError2: Function \"scraper2\" doesn't exist in this Service\n    at Service.getFunction (file:///C:/Users/ibrah/.serverless/releases/4.2.3/package/dist/sf-core.js:885:12898)\n    at AwsLogs.extendedValidate (file:///C:/Users/ibrah/.serverless/releases/4.2.3/package/dist/sf-core.js:707:14592)\n    at logs:logs (file:///C:/Users/ibrah/.serverless/releases/4.2.3/package/dist/sf-core.js:707:14415)\n    at PluginManager.runHooks (file:///C:/Users/ibrah/.serverless/releases/4.2.3/package/dist/sf-core.js:884:9315)\n    at PluginManager.invoke (file:///C:/Users/ibrah/.serverless/releases/4.2.3/package/dist/sf-core.js:884:10091)\n    at async PluginManager.run (file:///C:/Users/ibrah/.serverless/releases/4.2.3/package/dist/sf-core.js:884:10811)\n    at async Serverless.run (file:///C:/Users/ibrah/.serverless/releases/4.2.3/package/dist/sf-core.js:891:10464)\n    at async runFramework (file:///C:/Users/ibrah/.serverless/releases/4.2.3/package/dist/sf-core.js:939:2314)\n    at async route (file:///C:/Users/ibrah/.serverless/releases/4.2.3/package/dist/sf-core.js:950:16936)\n    at async Object.run2 [as run] (file:///C:/Users/ibrah/.serverless/releases/4.2.3/package/dist/sf-core.js:950:17334)",
+      "code": "FUNCTION_MISSING_IN_SERVICE"
+    },
+    "params": {},
+    "machineId": "dfbc00184df48eccc003dfb471c4abc8",
+    "accessKeyV2": "<REDACTED>",
+    "accessKeyV1": "<REDACTED>",
+    "orgId": "9726be33-75c1-4f32-958b-ea58644bb470",
+    "orgName": "ebraheemaboraya",
+    "userId": "cz3rWmvVr8GZQLk9rq",
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "userName": "ebraheemaboraya",
+    "subscription": null,
+    "userEmail": "ibrahem.aboraya2002@gmail.com",
+    "serviceProviderAwsCredentials": "<REDACTED>",
+    "serviceProviderAwsAccountId": "533267035327",
+    "projectType": "framework",
+    "versionSf": "4.2.3",
+    "serviceProviderAwsCfStackName": "local-lambda-service-dev",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:533267035327:stack/lambda-scraper-dev/19ee3a90-569a-11ef-854b-0affefb4c111",
+    "serviceProviderAwsCfStackCreated": "2024-08-09T21:55:33.227Z",
+    "serviceProviderAwsCfStackUpdated": "2024-08-10T11:53:40.414Z",
+    "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "AppLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:533267035327:function:lambda-scraper-dev-app:3",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-lambda-scraper-dev-AppLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ServiceEndpoint",
+        "OutputValue": "https://m74zs7tbdi.execute-api.us-east-1.amazonaws.com/dev",
+        "Description": "URL of the service endpoint",
+        "ExportName": "sls-lambda-scraper-dev-ServiceEndpoint"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "lambda-scraper-dev-serverlessdeploymentbucket-uhtmw9f9ygky",
+        "ExportName": "sls-lambda-scraper-dev-ServerlessDeploymentBucketName"
+      }
+    ]
+  }
+}
