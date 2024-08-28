@@ -59,9 +59,9 @@ def insert_song_data(conn, cursor, song_data, artist_data, genre, duration_ms, s
                 duration_ms,
                 spotify_link,
                 source,
-                song_data.get('album', 'Unknown'),  # Example value; ensure the correct field from data
-                song_data.get('language', 'Unknown'),  # Example value; ensure the correct field from data
-                song_data.get('artist_type', 'Unknown')  # Example value; ensure the correct field from data
+                song_data.get('album', 'Unknown'),
+                song_data.get('language', 'Unknown'),
+                song_data.get('artist_type', 'Unknown')
             )
         )
         conn.commit()
@@ -83,7 +83,7 @@ def get_charts_by_date(date: str):
     try:
         # Fetch charts data for all countries on the specified date
         cursor.execute("""
-            SELECT s.rank, s.title, a.name AS artist, s.album, s.duration_ms, s.spotify_link, s.genre, s.language, s.artist_type, s.source
+            SELECT s.rank, s.title, a.name AS artist, s.album, s.duration_ms, s.spotify_link, s.genre, s.language, s.artist_type, s.source, s.distribution_date
             FROM songs s
             JOIN artists a ON s.artist_id = a.id
             WHERE s.distribution_date = %s;
@@ -93,6 +93,9 @@ def get_charts_by_date(date: str):
             raise HTTPException(status_code=404, detail="No charts found for the specified date")
 
         charts = {}
+        # Use the distribution date from the first result (they should all be the same)
+        distribution_date = results[0][10] if results else date
+
         for result in results:
             country = result[9]  # Replace with actual country source if stored differently
 
@@ -123,14 +126,13 @@ def get_charts_by_date(date: str):
                 charts[country] = []
             charts[country].append(song_data)
 
-        return {"date": date, "charts": charts}
+        return {"date": distribution_date.strftime("%Y-%m-%d"), "charts": charts}
 
     except Exception as e:
         logging.error(f"Error fetching charts: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     finally:
         close_connection(conn, cursor)
-
 
 @app.get("/charts/available-dates")
 def get_available_chart_dates():

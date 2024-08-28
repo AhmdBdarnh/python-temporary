@@ -1,4 +1,3 @@
-# scrapers/scraper1/handler.py
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -11,6 +10,7 @@ import time
 import boto3
 from botocore.config import Config
 import logging
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -59,13 +59,38 @@ def scrape_youtube_trending():
     html_content = driver.page_source
     soup = BeautifulSoup(html_content, "html.parser")
 
+    # Extract the date range string
+    date_range_tag = soup.find('span', class_='content style-scope ytmc-top-banner', id='chart-range-string')
+    if date_range_tag:
+        date_range_text = date_range_tag.text.strip()
+        # Extract the second date (after the dash)
+        start_date, end_date = date_range_text.split('-')
+        end_date = end_date.strip()
+
+        # Convert month name to numeric format and construct the final date
+        month_map = {
+            "Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04",
+            "May": "05", "Jun": "06", "Jul": "07", "Aug": "08",
+            "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"
+        }
+        end_date_parts = end_date.split()
+        end_month = month_map.get(end_date_parts[0], "01")
+        end_day = end_date_parts[1].replace(',', '')
+        end_year = end_date_parts[2]
+
+        # Format the date as YYYY-MM-DD
+        formatted_date = f"{end_year}-{end_month}-{end_day}"
+    else:
+        logging.warning("Could not find the chart range string.")
+        formatted_date = "2024-08-23"  # Fallback static date
+
     songs_data = []
     entries = soup.find_all('ytmc-entry-row')
     if not entries:
         logging.warning("No entries found on the page.")
     else:
         logging.info(f"Found {len(entries)} entries.")
-    
+
     for entry in entries:
         try:
             song = {}
@@ -73,26 +98,22 @@ def scrape_youtube_trending():
             rank_tag = entry.find('span', id='rank')
             if rank_tag:
                 song['rank'] = rank_tag.text.strip()
-            
+
             # Extract the title
             title_tag = entry.find('div', class_='title')
             if title_tag:
                 song['title'] = title_tag.text.strip()
-            
+
             # Extract the artist names
             artist_tags = entry.find_all('span', class_='artistName')
             song['artist'] = [artist.text.strip() for artist in artist_tags]
-            
-            # Extract the distribution date (if available)
-            distribution_date_tag = entry.find('span', class_='detailed-view-content detailed-view-release-date')
-            if distribution_date_tag:
-                song['distribution_date'] = distribution_date_tag.text.strip()
-            else:
-                song['distribution_date'] = "2024-08-23"  # Fallback static date
+
+            # Use the extracted formatted date
+            song['distribution_date'] = formatted_date
 
             # Add a static source
             song['source'] = 'youtube-trend100'
-            
+
             logging.info(f"Scraped song: {song}")
             songs_data.append(song)
         except Exception as e:
